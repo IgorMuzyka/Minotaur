@@ -32,5 +32,4 @@ extension Keyboard {
     public static var arrowLeft: Key { return 260 }
     public static var arrowRight: Key { return 261 }
     public static var `return`: Key { return 13 }
-    public static var space: Key { return 32 }
 }
