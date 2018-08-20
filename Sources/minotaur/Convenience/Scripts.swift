@@ -14,6 +14,10 @@ public enum Scripts {
 		run("open \(path)")
 	}
 
+    public static func preview(path: String) -> String {
+        return run("cat \(path)").stdout
+    }
+
 	public static func changeDirectory(to path: String) {
 		main.currentdirectory = path
 	}

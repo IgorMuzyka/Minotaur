@@ -17,9 +17,11 @@ public struct Color {
 	public static var selection: Color = Color(foreground: COLOR_GREEN, background: COLOR_BLACK)
 	public static var current: Color = Color(foreground: COLOR_MAGENTA, background: COLOR_BLACK)
 
-	public func wrap(_ renderFunction: () -> Void) {
-		attron(COLOR_PAIR(self.index))
-		renderFunction()
-		attroff(COLOR_PAIR(self.index))
+	public func wrap(_ renderFunction: @escaping () -> Void) -> () -> Void {
+        return {
+            attron(COLOR_PAIR(self.index))
+            renderFunction()
+            attroff(COLOR_PAIR(self.index))
+        }
 	}
 }

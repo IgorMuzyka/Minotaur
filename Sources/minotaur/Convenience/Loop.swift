@@ -1,10 +1,3 @@
-//
-//  Loop.swift
-//  Minotaur
-//
-//  Created by Igor Muzyka on 6/23/18.
-//  Copyright © 2018 Igor Muzyka. All rights reserved.
-//
 
 import Foundation
 

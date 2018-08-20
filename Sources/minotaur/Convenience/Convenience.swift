@@ -1,4 +1,14 @@
 
+precedencegroup LeftAssociativePrecedence {
+    associativity: left
+}
+
+infix operator | : LeftAssociativePrecedence
+
+internal func | <T, U, V> (from: @escaping (T) -> U, to: @escaping (U) -> V) -> (T) -> V {
+    return { to(from($0)) }
+}
+
 internal extension Array {
 
 	internal static func populate(amount: Int, generator: () -> Element) -> Array {

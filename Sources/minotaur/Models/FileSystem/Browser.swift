@@ -5,30 +5,36 @@ import Foundation
 public class Browser {
 
     public private(set) var path: Path
-	public private(set) var table: Table!
-	public private(set) var selection: UInt16!
+	private var table: Table!
+	private var selection: Int!
+    public var selected: Path? {
+        guard !path.isRegular else {
+            return nil
+        }
+        return contents[selection].path
+    }
 
-    public init(url: URL) {
+    public init(url: URL = Scripts.currentPath()) {
         self.path = Path(url: url)!
 		resetSelection()
 		updateTable()
     }
 
-	public func previous() {
-		if selection == 0 {
-			selection = UInt16(contents.count - 1)
-		} else {
-			selection -= 1
-		}
-	}
+    public func previous() {
+        if selection == 0 {
+            selection = table.cells.count - 1
+        } else {
+            selection -= 1
+        }
+    }
 
-	public func next() {
-		if selection == contents.count - 1 {
-			selection = 0
-		} else {
-			selection += 1
-		}
-	}
+    public func next() {
+        if selection == table.cells.count - 1 {
+            selection = 0
+        } else {
+            selection += 1
+        }
+    }
 
 	public func exit() {
 		path = path.parent
@@ -37,42 +43,66 @@ public class Browser {
 	}
 
 	public func navigate() {
-		path = contents[Int(selection)].path
+		select()
 		resetSelection()
 		updateTable()
 	}
 
-	public var render: (Display.Size) -> Void {
-		return { [unowned self] size in
-			Color.current.wrap {
-				addstr(self.path.description)
-				addstr("\n")
-			}
-			self.table.render(size, self.selection)
+    public func preview() {
+        select()
+        resetSelection()
+
+        let text = (try? TextFile(path: path).read())?.split(separator: "\n")
+        let lines = text?.map { View(text: String($0)) } ?? [View(text: "failed to generate preview for \(path)")]
+//        let lines = [View(text: (try? TextFile(path: path).read()) ?? "")]
+
+        self.table = Table(cells: lines)
+    }
+
+	public var render: (Screen.Size, Screen.Position) -> Void {
+		return { [unowned self] size, position in
+            var offset = position
+            var bounds = size
+            let view = View(text: self.path.description)
+            offset.wrap(Color.current.wrap(view.render))()
+
+            offset.y += 1
+            bounds.height -= 1
+
+			self.table.render(bounds, offset, self.selection)
 		}
 	}
+
+    private func select() {
+        path = contents[selection].path
+    }
 
 	private func resetSelection() {
 		selection = 0
 	}
 
 	private func updateTable() {
-		self.table = Table(cells: contents.map { View(text: $0.description) })
+        guard !contents.isEmpty else {
+            self.table = Table(cells: [View(text: String())])
+            
+            return
+        }
+        self.table = Table(cells: contents.map { View(text: $0.description) })
 	}
 }
 
 extension Browser {
 
     private var files: [File] {
-        return children.filter { $0.fileType! == .regular }.map(File.init)
+        return children.filter { $0.isRegular }.map(File.init)
     }
 
     private var directories: [Directory] {
-        return children.filter { $0.fileType! == .directory }.map(Directory.init)
+        return children.filter { $0.isDirectory }.map(Directory.init)
     }
 
     private var symbolicLinks: [SymbolicLink] {
-        return children.filter { $0.fileType! == .symbolicLink }.map(SymbolicLink.init)
+        return children.filter { $0.isSymbolicLink }.map(SymbolicLink.init)
     }
 
     private var contents: [BrowserItem] {

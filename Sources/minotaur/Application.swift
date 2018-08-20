@@ -3,9 +3,17 @@ import Cncurses
 
 public class Application {
 
-    let display = Display()
-    let keyboard = Keyboard()
-    let browser = Browser(url: Scripts.currentPath())
+//    enum Mode {
+//
+//        case navigation
+//        case interactive
+//        case fuzzySearch
+//    }
+
+    private let screen = Screen()
+    private var keyboard: Keyboard!
+    private let browser = Browser()
+//    private var mode: Mode = .navigation
 
     public init() {
        setup()
@@ -16,43 +24,25 @@ public class Application {
     }
 
 	private func setup() {
-		display.setup()
-
-		keyboard.register(key: Int32(UnicodeScalar("q").value)) { [unowned self] in
-			self.terminate()
-		}
-
-		keyboard.register(key: Keyboard.arrowUp) { [unowned self] in
-			self.browser.previous()
-		}
-
-		keyboard.register(key: Keyboard.arrowDown) { [unowned self] in
-			self.browser.next()
-		}
-
-		keyboard.register(key: Keyboard.arrowLeft) { [unowned self] in
-			self.browser.exit()
-		}
-
-		keyboard.register(key: Keyboard.arrowRight) { [unowned self] in
-			self.browser.navigate()
-		}
-
-		keyboard.register(key: Keyboard.return) { [unowned self] in
-			// if file open it if directory change to it
-			self.browser.navigate()
-		}
+		screen.setup()
+        keyboard = .navigation(application: self, browser: browser)
 	}
 
     private func loop() {
         repeat {
-			display.render(browser.render)
+			screen.render(render)
             keyboard.handleInput()
         } while true
     }
 
     public func terminate() {
-		display.teardown()
+		screen.teardown()
         exit(EX_OK)
+    }
+
+    private var render: (Screen.Size) -> Void {
+        return { [unowned self] size in
+            self.browser.render(size, .zero)
+        }
     }
 }

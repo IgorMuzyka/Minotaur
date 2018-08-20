@@ -25,11 +25,12 @@ public class Keyboard {
     }
 }
 
-extension Keyboard {
+extension Keyboard.Key {
 
-    public static var arrowUp: Key { return 259 }
-    public static var arrowDown: Key { return 258 }
-    public static var arrowLeft: Key { return 260 }
-    public static var arrowRight: Key { return 261 }
-    public static var `return`: Key { return 13 }
+    public static var arrowUp: Keyboard.Key { return 259 }
+    public static var arrowDown: Keyboard.Key { return 258 }
+    public static var arrowLeft: Keyboard.Key { return 260 }
+    public static var arrowRight: Keyboard.Key { return 261 }
+    public static var `return`: Keyboard.Key { return 13 }
+    public static var q: Keyboard.Key { return Int32(UnicodeScalar("q").value) }
 }
