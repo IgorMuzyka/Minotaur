@@ -22,19 +22,6 @@ public class Application {
 			self.terminate()
 		}
 
-		keyboard.register(key: Int32(UnicodeScalar("c").value)) { [unowned self] in
-			Scripts.changeDirectory(to: self.browser.path.description)
-
-			
-
-//			clear()
-//			addstr("lol")
-//			addstr(self.browser.path.description)
-//			addstr("lol")
-//			refresh()
-//			self.terminate()
-		}
-
 		keyboard.register(key: Keyboard.arrowUp) { [unowned self] in
 			self.browser.previous()
 		}
